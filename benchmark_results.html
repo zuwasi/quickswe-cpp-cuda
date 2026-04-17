@@ -327,10 +327,12 @@ function update(){deck.style.transform=`translateX(-${cur*100}vw)`;prev.style.di
 update();
 document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(1);if(e.key==='ArrowLeft')go(-1)});
 let tx=0,ty=0,mx=0,md=false;
+function isLink(el){while(el){if(el.tagName==='A')return true;el=el.parentElement}return false}
 document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY});
-document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(dx<0?1:-1)});
-document.addEventListener('mousedown',e=>{md=true;mx=e.clientX});
+document.addEventListener('touchend',e=>{if(isLink(e.target))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(dx<0?1:-1)});
+document.addEventListener('mousedown',e=>{if(isLink(e.target))return;md=true;mx=e.clientX});
 document.addEventListener('mouseup',e=>{if(md){const dx=e.clientX-mx;if(Math.abs(dx)>50)go(dx<0?1:-1);md=false}});
+document.addEventListener('click',e=>{if(isLink(e.target)){e.stopPropagation()}});
 </script>
 </body>
 </html>
