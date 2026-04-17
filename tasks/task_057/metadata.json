@@ -1,0 +1,7 @@
+{
+    "id": "task_057",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "description": "Smart pointer (shared_ptr clone) with incorrect reference counting during copy assignment",
+    "language": "cpp"
+}

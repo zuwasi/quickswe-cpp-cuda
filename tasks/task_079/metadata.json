@@ -1,0 +1,7 @@
+{
+    "id": "task_079",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "language": "cuda",
+    "description": "Fix prefix sum (scan) kernel with incorrect inclusive/exclusive offset producing shifted results."
+}

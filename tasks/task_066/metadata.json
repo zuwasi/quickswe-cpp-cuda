@@ -1,0 +1,7 @@
+{
+    "id": "task_066",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Graph: Tarjan's SCC algorithm with incorrect lowlink update",
+    "language": "cpp"
+}

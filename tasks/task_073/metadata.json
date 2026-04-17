@@ -1,0 +1,7 @@
+{
+    "id": "task_073",
+    "category": "bug_fix",
+    "difficulty": "extreme",
+    "description": "Compile-time ray tracer using constexpr with incorrect reflection vector",
+    "language": "cpp"
+}

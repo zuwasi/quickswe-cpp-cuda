@@ -1,0 +1,7 @@
+{
+    "id": "task_080",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "language": "cuda",
+    "description": "Fix 1D convolution kernel with incorrect halo cell boundary handling causing wrong edge results."
+}

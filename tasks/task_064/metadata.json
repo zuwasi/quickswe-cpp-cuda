@@ -1,0 +1,7 @@
+{
+    "id": "task_064",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Skip list with incorrect level probability distribution",
+    "language": "cpp"
+}

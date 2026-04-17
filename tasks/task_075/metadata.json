@@ -1,0 +1,7 @@
+{
+    "id": "task_075",
+    "category": "bug_fix",
+    "difficulty": "extreme",
+    "description": "Persistent data structure (HAMTrie) with incorrect structural sharing",
+    "language": "cpp"
+}

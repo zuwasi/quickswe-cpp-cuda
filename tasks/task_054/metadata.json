@@ -1,0 +1,7 @@
+{
+    "id": "task_054",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "description": "Priority queue (min-heap) with incorrect sift-down",
+    "language": "cpp"
+}

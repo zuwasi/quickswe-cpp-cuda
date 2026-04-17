@@ -1,0 +1,7 @@
+{
+    "id": "task_056",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "description": "Template metaprogramming: SFINAE-based type dispatch fails for const references",
+    "language": "cpp"
+}

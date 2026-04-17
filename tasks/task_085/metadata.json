@@ -1,0 +1,7 @@
+{
+    "id": "task_085",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "language": "cuda",
+    "description": "Fix radix sort with incorrect digit extraction for signed integers causing negative numbers to sort incorrectly."
+}

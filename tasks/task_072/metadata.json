@@ -1,0 +1,7 @@
+{
+    "id": "task_072",
+    "category": "feature",
+    "difficulty": "extreme",
+    "description": "Custom coroutine scheduler with incorrect symmetric transfer",
+    "language": "cpp"
+}

@@ -1,0 +1,7 @@
+{
+    "id": "task_076",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "language": "cuda",
+    "description": "Fix vector addition kernel with incorrect grid/block dimension calculation causing partial results."
+}

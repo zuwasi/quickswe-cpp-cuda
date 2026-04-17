@@ -1,0 +1,7 @@
+{
+    "id": "task_084",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "language": "cuda",
+    "description": "Fix stream compaction with incorrect scatter index from prefix sum causing duplicated/missing elements."
+}

@@ -1,0 +1,7 @@
+{
+    "id": "task_062",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "B+ tree with incorrect key redistribution during underflow",
+    "language": "cpp"
+}

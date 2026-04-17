@@ -1,0 +1,7 @@
+{
+    "id": "task_067",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Expression parser (Pratt parser) with incorrect precedence binding",
+    "language": "cpp"
+}

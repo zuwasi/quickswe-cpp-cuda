@@ -1,0 +1,7 @@
+{
+    "id": "task_070",
+    "category": "bug_fix",
+    "difficulty": "extreme",
+    "description": "Lock-free concurrent hash map with incorrect memory ordering (relaxed vs acquire/release)",
+    "language": "cpp"
+}

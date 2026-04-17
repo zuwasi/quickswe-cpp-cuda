@@ -1,0 +1,7 @@
+{
+    "id": "task_059",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "description": "Iterator invalidation bug in custom vector erase",
+    "language": "cpp"
+}

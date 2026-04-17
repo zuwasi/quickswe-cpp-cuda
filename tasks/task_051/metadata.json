@@ -1,0 +1,7 @@
+{
+    "id": "task_051",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "description": "Circular buffer with incorrect wrap-around logic",
+    "language": "cpp"
+}

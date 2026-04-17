@@ -1,0 +1,7 @@
+{
+    "id": "task_063",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Custom allocator (pool allocator) with incorrect free-list coalescing",
+    "language": "cpp"
+}

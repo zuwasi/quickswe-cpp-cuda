@@ -1,0 +1,7 @@
+{
+    "id": "task_083",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "language": "cuda",
+    "description": "Fix bitonic sort with incorrect compare-and-swap direction for non-power-of-2 arrays."
+}

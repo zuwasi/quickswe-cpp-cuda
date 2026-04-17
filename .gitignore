@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+*.exe
+*.o
+benchmark_run.log
+benchmark_err.log
+test_cuda_wsl.py
+check_path.py
+check_results.py
+diag_task.py
+run_benchmark_wsl.sh

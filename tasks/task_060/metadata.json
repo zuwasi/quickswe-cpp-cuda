@@ -1,0 +1,7 @@
+{
+    "id": "task_060",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "description": "Variadic template fold expression with incorrect pack expansion",
+    "language": "cpp"
+}

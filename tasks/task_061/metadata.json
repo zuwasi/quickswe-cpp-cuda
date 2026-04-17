@@ -1,0 +1,7 @@
+{
+    "id": "task_061",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Red-black tree with incorrect uncle color check during insertion fix-up",
+    "language": "cpp"
+}

@@ -1,0 +1,7 @@
+{
+    "id": "task_077",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "language": "cuda",
+    "description": "Fix matrix transpose kernel with incorrect shared memory indexing causing bank conflicts and wrong results."
+}

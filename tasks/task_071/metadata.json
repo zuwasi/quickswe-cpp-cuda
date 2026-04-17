@@ -1,0 +1,7 @@
+{
+    "id": "task_071",
+    "category": "bug_fix",
+    "difficulty": "extreme",
+    "description": "B-tree with lazy deletion and incorrect rebalancing during merge",
+    "language": "cpp"
+}

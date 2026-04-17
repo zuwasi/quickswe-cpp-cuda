@@ -1,0 +1,7 @@
+{
+    "id": "task_065",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Trie with compressed nodes (Patricia trie) and incorrect split logic",
+    "language": "cpp"
+}

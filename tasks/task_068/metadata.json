@@ -1,0 +1,7 @@
+{
+    "id": "task_068",
+    "category": "bug_fix",
+    "difficulty": "hard",
+    "description": "Custom regex NFA-to-DFA subset construction with incorrect epsilon closure",
+    "language": "cpp"
+}

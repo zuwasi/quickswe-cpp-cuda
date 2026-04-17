@@ -1,0 +1,7 @@
+{
+    "id": "task_069",
+    "category": "bug_fix",
+    "difficulty": "extreme",
+    "description": "Mini garbage collector (mark-compact) with incorrect forwarding pointer update",
+    "language": "cpp"
+}

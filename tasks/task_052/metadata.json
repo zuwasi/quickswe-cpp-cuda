@@ -1,0 +1,7 @@
+{
+    "id": "task_052",
+    "category": "bug_fix",
+    "difficulty": "easy",
+    "description": "String tokenizer with incorrect escape sequence handling",
+    "language": "cpp"
+}

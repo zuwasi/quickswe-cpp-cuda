@@ -1,0 +1,7 @@
+{
+    "id": "task_082",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "language": "cuda",
+    "description": "Fix CSR sparse matrix-vector multiplication with incorrect row pointer indexing and uninitialized accumulator."
+}

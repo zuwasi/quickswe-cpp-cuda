@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>QuickSWE v2 — Amp Deep³ vs Claude Opus 4.7</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a1a;--card:#12122a;--amp:#00d4ff;--claude:#d97706;--green:#22c55e;--red:#ef4444;--text:#e2e8f0;--muted:#94a3b8;--border:#1e293b}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;width:100vw}
+.deck{display:flex;height:100vh;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.slide{min-width:100vw;height:100vh;padding:clamp(20px,4vw,60px);display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow-y:auto}
+.slide h1{font-size:clamp(1.8rem,4vw,3.2rem);font-weight:900;margin-bottom:.5em;text-align:center}
+.slide h2{font-size:clamp(1.2rem,2.5vw,2rem);font-weight:700;margin-bottom:.5em;text-align:center;color:var(--muted)}
+.slide h3{font-size:clamp(1rem,2vw,1.5rem);font-weight:600;margin-bottom:.8em}
+.slide p{font-size:clamp(.85rem,1.4vw,1.1rem);line-height:1.6;max-width:900px;text-align:center;color:var(--muted)}
+.amp-color{color:var(--amp)}.claude-color{color:var(--claude)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:clamp(16px,2vw,32px);backdrop-filter:blur(10px);width:100%;max-width:1000px;margin:.5em 0}
+.stats-row{display:flex;gap:clamp(12px,2vw,32px);justify-content:center;flex-wrap:wrap;margin:1em 0}
+.stat-box{text-align:center;padding:clamp(12px,2vw,24px);background:var(--card);border-radius:12px;border:1px solid var(--border);min-width:140px;flex:1;max-width:220px}
+.stat-box .num{font-size:clamp(2rem,4vw,3.5rem);font-weight:900;line-height:1}
+.stat-box .label{font-size:clamp(.7rem,1vw,.9rem);color:var(--muted);margin-top:4px}
+.stat-box.amp-box{border-color:var(--amp);box-shadow:0 0 20px rgba(0,212,255,.15)}
+.stat-box.claude-box{border-color:var(--claude);box-shadow:0 0 20px rgba(217,119,6,.15)}
+.bar-group{margin:.6em 0;width:100%;max-width:700px}
+.bar-label{display:flex;justify-content:space-between;font-size:clamp(.75rem,1.1vw,.95rem);margin-bottom:4px}
+.bar-track{height:28px;background:#1e293b;border-radius:6px;overflow:hidden;margin-bottom:2px;position:relative}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:.75rem;font-weight:600;transition:width 1s ease}
+.bar-fill.amp{background:linear-gradient(90deg,var(--amp),#0099cc)}
+.bar-fill.claude{background:linear-gradient(90deg,var(--claude),#b45309)}
+table{width:100%;border-collapse:collapse;font-size:clamp(.65rem,.9vw,.85rem)}
+th{background:#1a1a3a;padding:8px 6px;text-align:left;font-weight:600;position:sticky;top:0;z-index:1}
+td{padding:6px;border-bottom:1px solid var(--border)}
+tr:hover{background:rgba(255,255,255,.03)}
+.pass{color:var(--green)}.fail{color:var(--red)}.skip{color:var(--muted)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge-easy{background:#166534;color:#86efac}.badge-medium{background:#854d0e;color:#fde68a}
+.badge-hard{background:#991b1b;color:#fca5a5}.badge-extreme{background:#581c87;color:#d8b4fe}
+.table-scroll{max-height:65vh;overflow-y:auto;border-radius:12px;border:1px solid var(--border)}
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,24px);width:100%;max-width:800px;margin:1em 0}
+@media(max-width:700px){.verdict-grid{grid-template-columns:1fr}.stats-row{flex-direction:column;align-items:center}}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:rgba(10,10,26,.8);color:var(--text);font-size:1.5rem;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);transition:all .2s}
+.nav-btn:hover{border-color:var(--amp);color:var(--amp);box-shadow:0 0 15px rgba(0,212,255,.3)}
+#prevBtn{left:12px}#nextBtn{right:12px}
+.progress{position:fixed;bottom:0;left:0;width:100%;height:4px;background:var(--border);z-index:100}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--amp),#7c3aed);transition:width .4s ease}
+.counter{position:fixed;bottom:12px;right:16px;font-size:.8rem;color:var(--muted);z-index:100}
+.swipe-hint{position:absolute;bottom:60px;text-align:center;width:100%;font-size:.9rem;color:var(--muted);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.failure-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin:6px 0;width:100%;max-width:800px}
+.failure-card .task-id{font-weight:700;color:var(--red)}
+.failure-card .desc{color:var(--muted);font-size:.85rem}
+.highlight{background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(124,58,237,.1));border:1px solid rgba(0,212,255,.3);border-radius:12px;padding:clamp(12px,2vw,20px);margin:.5em 0;text-align:center;max-width:800px}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1: Title -->
+<div class="slide" style="background:radial-gradient(ellipse at 30% 40%,rgba(0,212,255,.08),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(217,119,6,.06),transparent 60%)">
+<h1>QuickSWE v2<br><span style="font-size:.6em;color:var(--muted)">C++ &amp; CUDA Benchmark</span></h1>
+<div style="display:flex;gap:20px;align-items:center;margin:1em 0">
+<div style="text-align:center"><span class="amp-color" style="font-size:1.4rem;font-weight:700">Amp Deep³</span><br><span style="font-size:.8rem;color:var(--muted)">cross-provider reasoning</span></div>
+<span style="font-size:2rem;color:var(--muted)">vs</span>
+<div style="text-align:center"><span class="claude-color" style="font-size:1.4rem;font-weight:700">Claude Opus 4.7</span><br><span style="font-size:.8rem;color:var(--muted)">Anthropic's latest</span></div>
+</div>
+<p>April 17, 2026 &nbsp;|&nbsp; 41 Valid Tasks &nbsp;|&nbsp; WSL2 + CUDA 12.8 + g++ 13.3</p>
+<p style="margin-top:.5em;font-size:.8rem">22 C++ tasks (easy → extreme) &nbsp;•&nbsp; 19 CUDA tasks (easy → extreme)</p>
+<div class="swipe-hint" id="swipeHint">← Swipe to navigate →</div>
+</div>
+
+<!-- SLIDE 2: Executive Summary -->
+<div class="slide">
+<h1>Executive Summary</h1>
+<div class="stats-row">
+<div class="stat-box amp-box"><div class="num amp-color">97.6%</div><div class="label">Amp Deep³ Resolve Rate</div></div>
+<div class="stat-box claude-box"><div class="num claude-color">82.9%</div><div class="label">Claude Opus 4.7 Resolve Rate</div></div>
+</div>
+<div class="stats-row">
+<div class="stat-box"><div class="num" style="font-size:2rem">40<span style="font-size:1rem;color:var(--muted)">/41</span></div><div class="label">Amp Resolved</div></div>
+<div class="stat-box"><div class="num" style="font-size:2rem">34<span style="font-size:1rem;color:var(--muted)">/41</span></div><div class="label">Claude Resolved</div></div>
+<div class="stat-box"><div class="num" style="font-size:2rem;color:var(--green)">1</div><div class="label">Amp Regressions</div></div>
+<div class="stat-box"><div class="num" style="font-size:2rem;color:var(--red)">3</div><div class="label">Claude Regressions</div></div>
+</div>
+<div class="highlight">
+<span style="font-size:1.2rem;font-weight:700">Amp Deep³ resolves <span class="amp-color">18% more tasks</span></span><br>
+<span style="color:var(--muted);font-size:.9rem">and causes 3× fewer regressions than Claude Opus 4.7</span>
+</div>
+</div>
+
+<!-- SLIDE 3: C++ Results -->
+<div class="slide">
+<h1>⚙️ C++ Results — <span class="amp-color">22</span> Valid Tasks</h1>
+<div class="stats-row">
+<div class="stat-box amp-box"><div class="num amp-color">100%</div><div class="label">Amp Deep³ (22/22)</div></div>
+<div class="stat-box claude-box"><div class="num claude-color">90.9%</div><div class="label">Claude Opus 4.7 (20/22)</div></div>
+</div>
+<h3 style="margin-top:1em">By Difficulty</h3>
+<div class="bar-group">
+<div class="bar-label"><span>🟢 Easy (5 tasks)</span><span>Both 100%</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 5/5</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:100%">Claude 5/5</div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>🟡 Medium (4 tasks)</span><span>Both 100%</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 4/4</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:100%">Claude 4/4</div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>🟠 Hard (8 tasks)</span><span class="amp-color">Amp leads</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 8/8</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:87.5%">Claude 7/8</div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>🔴 Extreme (5 tasks)</span><span class="amp-color">Amp leads</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 5/5</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:80%">Claude 4/5</div></div>
+</div>
+</div>
+
+<!-- SLIDE 4: CUDA Results -->
+<div class="slide">
+<h1>🟢 CUDA Results — <span class="amp-color">19</span> Valid Tasks</h1>
+<div class="stats-row">
+<div class="stat-box amp-box"><div class="num amp-color">94.7%</div><div class="label">Amp Deep³ (18/19)</div></div>
+<div class="stat-box claude-box"><div class="num claude-color">73.7%</div><div class="label">Claude Opus 4.7 (14/19)</div></div>
+</div>
+<h3 style="margin-top:1em">By Difficulty</h3>
+<div class="bar-group">
+<div class="bar-label"><span>🟢 Easy (4 tasks)</span><span>Both 100%</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 4/4</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:100%">Claude 4/4</div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>🟡 Medium (5 tasks)</span><span class="amp-color">Amp leads</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 5/5</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:80%">Claude 4/5</div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>🟠 Hard (4 tasks)</span><span class="amp-color">Amp leads</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:75%">Amp 3/4</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:50%">Claude 2/4</div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>🔴 Extreme (6 tasks)</span><span class="amp-color">Amp dominates</span></div>
+<div class="bar-track"><div class="bar-fill amp" style="width:100%">Amp 6/6</div></div>
+<div class="bar-track"><div class="bar-fill claude" style="width:66.7%">Claude 4/6</div></div>
+</div>
+</div>
+
+<!-- SLIDE 5: Difficulty Scaling -->
+<div class="slide">
+<h1>📈 Difficulty Scaling</h1>
+<p style="margin-bottom:1em">How each agent degrades as task difficulty increases</p>
+<div class="card">
+<div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 20px;align-items:center;font-size:clamp(.8rem,1.1vw,.95rem)">
+<div style="font-weight:700">Difficulty</div><div style="font-weight:700;color:var(--amp)">Amp Deep³</div><div style="font-weight:700;color:var(--claude)">Claude Opus 4.7</div>
+<div>🟢 Easy (9)</div><div class="amp-color" style="font-weight:700">100% (9/9)</div><div class="claude-color" style="font-weight:700">100% (9/9)</div>
+<div>🟡 Medium (9)</div><div class="amp-color" style="font-weight:700">100% (9/9)</div><div class="claude-color" style="font-weight:700">88.9% (8/9)</div>
+<div>🟠 Hard (12)</div><div class="amp-color" style="font-weight:700">91.7% (11/12)</div><div class="claude-color" style="font-weight:700">75.0% (9/12)</div>
+<div>🔴 Extreme (11)</div><div class="amp-color" style="font-weight:700">100% (11/11)</div><div class="claude-color" style="font-weight:700">72.7% (8/11)</div>
+</div>
+</div>
+<div class="highlight" style="margin-top:1em">
+<span style="font-weight:700">Claude drops from <span class="claude-color">100%</span> on easy tasks to <span style="color:var(--red)">72.7%</span> on extreme</span><br>
+<span style="color:var(--muted)">Amp stays at <span class="amp-color">91.7–100%</span> across all levels — virtually flat</span>
+</div>
+</div>
+
+<!-- SLIDE 6: Head-to-Head C++ -->
+<div class="slide">
+<h1>⚙️ Head-to-Head: C++ Tasks</h1>
+<div class="table-scroll card" style="padding:0;overflow:auto;max-height:72vh">
+<table>
+<thead><tr><th>Task</th><th>Difficulty</th><th>Description</th><th>Amp</th><th>Time</th><th>Claude</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>051</td><td><span class="badge badge-easy">Easy</span></td><td>Circular buffer wrap-around</td><td class="pass">✅</td><td>77.9s</td><td class="pass">✅</td><td>22.1s</td></tr>
+<tr><td>052</td><td><span class="badge badge-easy">Easy</span></td><td>String tokenizer escapes</td><td class="pass">✅</td><td>73.3s</td><td class="pass">✅</td><td>59.6s</td></tr>
+<tr><td>053</td><td><span class="badge badge-easy">Easy</span></td><td>Matrix mul dimension indexing</td><td class="pass">✅</td><td>29.4s</td><td class="pass">✅</td><td>11.2s</td></tr>
+<tr><td>054</td><td><span class="badge badge-easy">Easy</span></td><td>Min-heap sift-down</td><td class="pass">✅</td><td>48.3s</td><td class="pass">✅</td><td>15.4s</td></tr>
+<tr><td>055</td><td><span class="badge badge-easy">Easy</span></td><td>Hash map linear probing</td><td class="pass">✅</td><td>62.4s</td><td class="pass">✅</td><td>32.6s</td></tr>
+<tr><td>056</td><td><span class="badge badge-medium">Med</span></td><td>SFINAE type dispatch</td><td class="pass">✅</td><td>86.3s</td><td class="pass">✅</td><td>39.7s</td></tr>
+<tr><td>057</td><td><span class="badge badge-medium">Med</span></td><td>Shared_ptr ref counting</td><td class="pass">✅</td><td>77.2s</td><td class="pass">✅</td><td>11.1s</td></tr>
+<tr><td>059</td><td><span class="badge badge-medium">Med</span></td><td>Iterator invalidation in erase</td><td class="pass">✅</td><td>47.0s</td><td class="pass">✅</td><td>13.6s</td></tr>
+<tr><td>060</td><td><span class="badge badge-medium">Med</span></td><td>Variadic fold expression</td><td class="pass">✅</td><td>62.1s</td><td class="pass">✅</td><td>40.4s</td></tr>
+<tr><td>061</td><td><span class="badge badge-hard">Hard</span></td><td>Red-black tree insertion fix-up</td><td class="pass">✅</td><td>41.0s</td><td class="pass">✅</td><td>19.2s</td></tr>
+<tr><td>062</td><td><span class="badge badge-hard">Hard</span></td><td>B+ tree key redistribution</td><td class="pass">✅</td><td>53.8s</td><td class="pass">✅</td><td>105.7s</td></tr>
+<tr><td>063</td><td><span class="badge badge-hard">Hard</span></td><td>Pool allocator free-list</td><td class="pass">✅</td><td>38.9s</td><td class="pass">✅</td><td>36.3s</td></tr>
+<tr><td>065</td><td><span class="badge badge-hard">Hard</span></td><td>Patricia trie split logic</td><td class="pass">✅</td><td>100.0s</td><td class="pass">✅</td><td>189.1s</td></tr>
+<tr><td>066</td><td><span class="badge badge-hard">Hard</span></td><td>Tarjan's SCC lowlink</td><td class="pass">✅</td><td>120.1s</td><td class="fail">❌</td><td>11.3s</td></tr>
+<tr><td>067</td><td><span class="badge badge-hard">Hard</span></td><td>Pratt parser precedence</td><td class="pass">✅</td><td>101.0s</td><td class="pass">✅</td><td>41.9s</td></tr>
+<tr><td>068</td><td><span class="badge badge-hard">Hard</span></td><td>NFA→DFA epsilon closure</td><td class="pass">✅</td><td>46.7s</td><td class="pass">✅</td><td>25.5s</td></tr>
+<tr><td>069</td><td><span class="badge badge-extreme">Ext</span></td><td>Mark-compact GC forwarding ptrs</td><td class="pass">✅</td><td>123.7s</td><td class="pass">✅</td><td>84.2s</td></tr>
+<tr><td>071</td><td><span class="badge badge-extreme">Ext</span></td><td>B-tree lazy deletion rebalance</td><td class="pass">✅</td><td>122.4s</td><td class="pass">✅</td><td>339.2s</td></tr>
+<tr><td>072</td><td><span class="badge badge-extreme">Ext</span></td><td>Coroutine scheduler transfer</td><td class="pass">✅</td><td>175.6s</td><td class="fail">❌ ⏰</td><td>600.1s</td></tr>
+<tr><td>073</td><td><span class="badge badge-extreme">Ext</span></td><td>Constexpr ray tracer reflect</td><td class="pass">✅</td><td>40.8s</td><td class="pass">✅</td><td>17.1s</td></tr>
+<tr><td>074</td><td><span class="badge badge-extreme">Ext</span></td><td>SIMD matrix alignment/masks</td><td class="pass">✅</td><td>145.0s</td><td class="pass">✅⚠️</td><td>112.9s</td></tr>
+<tr><td>075</td><td><span class="badge badge-extreme">Ext</span></td><td>HAMT persistent data structure</td><td class="pass">✅</td><td>88.4s</td><td class="pass">✅</td><td>23.2s</td></tr>
+</tbody>
+</table>
+</div>
+<p style="font-size:.75rem;margin-top:8px">⏰ = timeout (600s) &nbsp; ⚠️ = regression (broke existing tests)</p>
+</div>
+
+<!-- SLIDE 7: Head-to-Head CUDA -->
+<div class="slide">
+<h1>🟢 Head-to-Head: CUDA Tasks</h1>
+<div class="table-scroll card" style="padding:0;overflow:auto;max-height:72vh">
+<table>
+<thead><tr><th>Task</th><th>Difficulty</th><th>Description</th><th>Amp</th><th>Time</th><th>Claude</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>076</td><td><span class="badge badge-easy">Easy</span></td><td>Vector add grid/block dims</td><td class="pass">✅</td><td>42.9s</td><td class="pass">✅</td><td>17.6s</td></tr>
+<tr><td>078</td><td><span class="badge badge-easy">Easy</span></td><td>Histogram atomicAdd races</td><td class="pass">✅</td><td>43.7s</td><td class="pass">✅</td><td>12.4s</td></tr>
+<tr><td>079</td><td><span class="badge badge-easy">Easy</span></td><td>Prefix sum offset error</td><td class="pass">✅</td><td>41.4s</td><td class="pass">✅</td><td>14.0s</td></tr>
+<tr><td>080</td><td><span class="badge badge-easy">Easy</span></td><td>1D convolution halo cells</td><td class="pass">✅</td><td>106.2s</td><td class="pass">✅</td><td>34.6s</td></tr>
+<tr><td>081</td><td><span class="badge badge-medium">Med</span></td><td>Warp shuffle reduction mask</td><td class="pass">✅</td><td>54.1s</td><td class="fail">❌</td><td>14.1s</td></tr>
+<tr><td>082</td><td><span class="badge badge-medium">Med</span></td><td>CSR SpMV row pointer indexing</td><td class="pass">✅</td><td>62.7s</td><td class="pass">✅</td><td>14.8s</td></tr>
+<tr><td>083</td><td><span class="badge badge-medium">Med</span></td><td>Bitonic sort non-power-of-2</td><td class="pass">✅</td><td>71.6s</td><td class="pass">✅</td><td>254.9s</td></tr>
+<tr><td>084</td><td><span class="badge badge-medium">Med</span></td><td>Stream compaction scatter</td><td class="pass">✅</td><td>75.9s</td><td class="pass">✅</td><td>66.3s</td></tr>
+<tr><td>085</td><td><span class="badge badge-medium">Med</span></td><td>Radix sort signed integers</td><td class="pass">✅</td><td>53.3s</td><td class="pass">✅</td><td>21.1s</td></tr>
+<tr><td>087</td><td><span class="badge badge-hard">Hard</span></td><td>Cooperative groups tile partition</td><td class="pass">✅</td><td>71.7s</td><td class="fail">❌</td><td>24.8s</td></tr>
+<tr><td>088</td><td><span class="badge badge-hard">Hard</span></td><td>Unified memory prefetch hints</td><td class="pass">✅</td><td>42.5s</td><td class="pass">✅</td><td>34.8s</td></tr>
+<tr><td>090</td><td><span class="badge badge-hard">Hard</span></td><td>Warp-divergent predication</td><td class="pass">✅</td><td>88.5s</td><td class="pass">✅</td><td>72.3s</td></tr>
+<tr><td>091</td><td><span class="badge badge-hard">Hard</span></td><td>Tensor core WMMA layout</td><td class="fail">❌⚠️</td><td>54.4s</td><td class="fail">❌⚠️</td><td>18.8s</td></tr>
+<tr><td>094</td><td><span class="badge badge-extreme">Ext</span></td><td>Dynamic parallelism streams</td><td class="pass">✅</td><td>89.4s</td><td class="fail">❌⚠️</td><td>58.3s</td></tr>
+<tr><td>095</td><td><span class="badge badge-extreme">Ext</span></td><td>Custom GEMM tiling + double buf</td><td class="pass">✅</td><td>66.7s</td><td class="pass">✅</td><td>71.3s</td></tr>
+<tr><td>096</td><td><span class="badge badge-extreme">Ext</span></td><td>BFS warp-centric frontier</td><td class="pass">✅</td><td>109.5s</td><td class="fail">❌</td><td>36.8s</td></tr>
+<tr><td>097</td><td><span class="badge badge-extreme">Ext</span></td><td>FFT Cooley-Tukey twiddle</td><td class="pass">✅</td><td>81.4s</td><td class="pass">✅</td><td>240.5s</td></tr>
+<tr><td>099</td><td><span class="badge badge-extreme">Ext</span></td><td>Ray tracing BVH traversal</td><td class="pass">✅</td><td>46.2s</td><td class="pass">✅</td><td>37.3s</td></tr>
+<tr><td>100</td><td><span class="badge badge-extreme">Ext</span></td><td>Molecular dynamics neighbor list</td><td class="pass">✅</td><td>66.4s</td><td class="pass">✅</td><td>65.2s</td></tr>
+</tbody>
+</table>
+</div>
+<p style="font-size:.75rem;margin-top:8px">⚠️ = regression (broke existing tests)</p>
+</div>
+
+<!-- SLIDE 8: Where Claude Failed -->
+<div class="slide">
+<h1>🔍 Where Claude Opus 4.7 Failed</h1>
+<p style="margin-bottom:1em">7 tasks failed — failures cluster on GPU-specific concepts</p>
+<div class="failure-card"><span class="task-id">task_066</span> <span class="badge badge-hard">Hard</span> C++<br><span class="desc">Tarjan's SCC algorithm — incorrect lowlink update (11.3s — gave up fast)</span></div>
+<div class="failure-card"><span class="task-id">task_072</span> <span class="badge badge-extreme">Extreme</span> C++<br><span class="desc">Custom coroutine scheduler — incorrect symmetric transfer (⏰ TIMEOUT 600s)</span></div>
+<div class="failure-card"><span class="task-id">task_081</span> <span class="badge badge-medium">Medium</span> CUDA<br><span class="desc">Warp-level shuffle reduction — incorrect mask (14.1s — gave up fast)</span></div>
+<div class="failure-card"><span class="task-id">task_087</span> <span class="badge badge-hard">Hard</span> CUDA<br><span class="desc">Cooperative groups tile partition — incorrect tile size for partial warps</span></div>
+<div class="failure-card"><span class="task-id">task_091</span> <span class="badge badge-hard">Hard</span> CUDA<br><span class="desc">Tensor core WMMA fragment layout — row vs col major mismatch (both agents failed)</span></div>
+<div class="failure-card"><span class="task-id">task_094</span> <span class="badge badge-extreme">Extreme</span> CUDA<br><span class="desc">Dynamic parallelism — nested kernel launch stream management + regression</span></div>
+<div class="failure-card"><span class="task-id">task_096</span> <span class="badge badge-extreme">Extreme</span> CUDA<br><span class="desc">BFS graph traversal — warp-centric frontier expansion</span></div>
+<div class="highlight" style="margin-top:1em">
+<span style="font-weight:700;color:var(--red)">Pattern: Claude struggles with GPU warp semantics, tensor cores, and cooperative groups</span><br>
+<span style="color:var(--muted)">5 of 7 failures involve CUDA-specific parallel primitives</span>
+</div>
+</div>
+
+<!-- SLIDE 9: Regression Analysis -->
+<div class="slide">
+<h1>⚠️ Regression Analysis</h1>
+<p style="margin-bottom:1em">Regressions = agent broke existing passing tests while trying to fix bugs</p>
+<div class="stats-row">
+<div class="stat-box amp-box"><div class="num" style="font-size:3rem;color:var(--green)">1</div><div class="label">Amp Regressions</div></div>
+<div class="stat-box claude-box"><div class="num" style="font-size:3rem;color:var(--red)">3</div><div class="label">Claude Regressions</div></div>
+</div>
+<div class="card" style="margin-top:1em">
+<h3 class="amp-color" style="margin-bottom:8px">Amp Deep³ — 1 Regression</h3>
+<p style="text-align:left;font-size:.9rem">• <strong>task_091</strong> (CUDA Hard) — Tensor core WMMA layout. Failed to resolve AND regressed.</p>
+<h3 class="claude-color" style="margin-top:16px;margin-bottom:8px">Claude Opus 4.7 — 3 Regressions</h3>
+<p style="text-align:left;font-size:.9rem">
+• <strong>task_074</strong> (C++ Extreme) — SIMD matrix alignment. Resolved but broke pass_to_pass tests.<br>
+• <strong>task_091</strong> (CUDA Hard) — Tensor core WMMA layout. Failed AND regressed.<br>
+• <strong>task_094</strong> (CUDA Extreme) — Dynamic parallelism streams. Failed AND regressed.
+</p>
+</div>
+<div class="highlight" style="margin-top:1em">
+<span style="font-weight:700">Claude Opus 4.7 is <span style="color:var(--red)">3× more likely</span> to break what already works</span>
+</div>
+</div>
+
+<!-- SLIDE 10: Verdict -->
+<div class="slide" style="background:radial-gradient(ellipse at 50% 40%,rgba(0,212,255,.1),transparent 60%)">
+<h1>🏆 Verdict</h1>
+<h2>Amp Deep³ wins decisively</h2>
+<div class="verdict-grid">
+<div class="stat-box amp-box">
+<div class="num amp-color" style="font-size:2.5rem">97.6%</div>
+<div class="label">Amp Overall</div>
+</div>
+<div class="stat-box claude-box">
+<div class="num claude-color" style="font-size:2.5rem">82.9%</div>
+<div class="label">Claude Overall</div>
+</div>
+<div class="stat-box" style="border-color:var(--amp)">
+<div style="font-size:1.1rem;font-weight:700"><span class="amp-color">100%</span> vs <span class="claude-color">90.9%</span></div>
+<div class="label">C++ Resolve Rate</div>
+</div>
+<div class="stat-box" style="border-color:var(--amp)">
+<div style="font-size:1.1rem;font-weight:700"><span class="amp-color">94.7%</span> vs <span class="claude-color">73.7%</span></div>
+<div class="label">CUDA Resolve Rate</div>
+</div>
+</div>
+<div class="card" style="text-align:center;margin-top:1em">
+<p style="font-size:1rem;line-height:1.8">
+<strong style="color:var(--red)">Claude Opus 4.7 struggles with GPU-specific concepts:</strong><br>
+warp shuffle masks • cooperative groups • tensor cores • dynamic parallelism<br><br>
+<strong class="amp-color">Amp Deep³ maintains near-perfect accuracy across all difficulty levels</strong><br>
+100% on easy through extreme C++ • 94.7% on CUDA<br><br>
+<span style="color:var(--green)">✅ Zero safety violations from either agent (ACL-protected directories)</span>
+</p>
+</div>
+</div>
+
+</div><!-- /deck -->
+
+<button class="nav-btn" id="prevBtn" onclick="go(-1)">‹</button>
+<button class="nav-btn" id="nextBtn" onclick="go(1)">›</button>
+<div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+<div class="counter" id="counter"></div>
+
+<script>
+let cur=0;const deck=document.getElementById('deck'),slides=deck.children,total=slides.length;
+const prev=document.getElementById('prevBtn'),next=document.getElementById('nextBtn');
+const prog=document.getElementById('progressFill'),cnt=document.getElementById('counter');
+const hint=document.getElementById('swipeHint');
+function go(d){const n=cur+d;if(n<0||n>=total)return;cur=n;update()}
+function update(){deck.style.transform=`translateX(-${cur*100}vw)`;prev.style.display=cur===0?'none':'flex';next.style.display=cur===total-1?'none':'flex';prog.style.width=((cur+1)/total*100)+'%';cnt.textContent=(cur+1)+' / '+total;if(cur>0&&hint)hint.style.display='none'}
+update();
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(1);if(e.key==='ArrowLeft')go(-1)});
+let tx=0,ty=0,mx=0,md=false;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY});
+document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(dx<0?1:-1)});
+document.addEventListener('mousedown',e=>{md=true;mx=e.clientX});
+document.addEventListener('mouseup',e=>{if(md){const dx=e.clientX-mx;if(Math.abs(dx)>50)go(dx<0?1:-1);md=false}});
+</script>
+</body>
+</html>

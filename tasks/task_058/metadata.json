@@ -1,0 +1,7 @@
+{
+    "id": "task_058",
+    "category": "bug_fix",
+    "difficulty": "medium",
+    "description": "Lock-free stack with ABA problem in compare_and_swap",
+    "language": "cpp"
+}
